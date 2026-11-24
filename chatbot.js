@@ -80,16 +80,14 @@
     const pending = addMessage("กำลังส่งคำถามและตรวจสอบผลวัดล่าสุด...", "assistant");
 
     try {
-      let soilData = null;
-      try { soilData = await getLatestSoilData(); } catch (_) {}
+      // Backend อ่านค่าจาก camera_live_values โดยตรง จึงไม่ต้องเรียก /api/data ซ้ำก่อนแชต
       const response = await fetch("/api/chat", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message,
-          history: history.slice(-8),
-          soil_data: soilData,
+          history: history.slice(-4),
           crop: cropInput ? cropInput.value.trim() : ""
         })
       });
@@ -100,7 +98,7 @@
         { role: "user", text: message },
         { role: "model", text: pending.textContent }
       );
-      history = history.slice(-8);
+      history = history.slice(-4);
     } catch (error) {
       pending.textContent = "ขออภัย: " + (error.message || "เกิดข้อผิดพลาด");
     } finally {
@@ -123,5 +121,5 @@
   });
 
   refreshSoilStatus();
-  window.setInterval(refreshSoilStatus, 5000);
+  window.setInterval(refreshSoilStatus, 10000);
 })();
