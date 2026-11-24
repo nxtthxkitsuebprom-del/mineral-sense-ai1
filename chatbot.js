@@ -16,7 +16,13 @@
   function appendInline(parent, text) {
     // Render only a small safe Markdown subset; never inject model text as HTML.
     const tick = String.fromCharCode(96);
-    const parts = String(text).split(/(\*\*[^*]+\*\*|\x60[^\x60]+\x60)/g);
+    let source = String(text);
+    // If the model accidentally leaves bold markers unclosed, don't show raw **.
+    for (const line of source.split("\n")) {
+      const count = (line.match(/\*\*/g) || []).length;
+      if (count % 2 !== 0) source = source.replace(line, line.replace(/\*\*/g, ""));
+    }
+    const parts = source.split(/(\*\*[^*]+\*\*|\x60[^\x60]+\x60)/g);
     for (const part of parts) {
       if (!part) continue;
       if (part.startsWith("**") && part.endsWith("**")) {
