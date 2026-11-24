@@ -485,22 +485,74 @@ def chatbot_api():
         from google.genai import types
 
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model=CHAT_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=CHAT_SYSTEM_PROMPT,
-                temperature=0.4,
-                max_output_tokens=1000
-            )
-        )
-        answer = (response.text or '').strip()
-        if not answer:
-            return jsonify(ok=False, error='AI ยังไม่สามารถสร้างคำตอบได้ กรุณาลองใหม่'), 502
+        # Retry temporary Gemini service/rate-limit failures. A fallback model is
+        # optional and must be configured explicitly in Render Environment.
+        fallback_model = os.getenv('GEMINI_FALLBACK_MODEL', '').strip()
+        models_to_try = [CHAT_MODEL]
+        if fallback_model and fallback_model != CHAT_MODEL:
+            models_to_try.append(fallback_model)
+
+        response = None
+        last_error = None
+        for model_index, model_name in enumerate(models_to_try):
+            attempts = 3 if model_index == 0 else 2
+            for attempt in range(attempts):
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=CHAT_SYSTEM_PROMPT,
+                            temperature=0.4,
+                            max_output_tokens=1000
+                        )
+                    )
+                    if response and (response.text or '').strip():
+                        break
+                    raise RuntimeError('Gemini returned an empty response')
+                except Exception as error:
+                    last_error = error
+                    error_text = str(error).upper()
+                    status_code = getattr(error, 'code', None) or getattr(error, 'status_code', None)
+                    retryable = (
+                        status_code in (429, 500, 502, 503, 504)
+                        or any(code in error_text for code in (
+                            '429', '500', '502', '503', '504',
+                            'RESOURCE_EXHAUSTED', 'UNAVAILABLE',
+                            'INTERNAL', 'DEADLINE_EXCEEDED',
+                            'SERVICE UNAVAILABLE', 'TOO MANY REQUESTS'
+                        ))
+                        or isinstance(error, (TimeoutError, ConnectionError))
+                    )
+                    if not retryable:
+                        raise
+                    if attempt < attempts - 1:
+                        delay = min(2 ** attempt, 4)
+                        app.logger.warning(
+                            'Gemini temporary error; retrying model=%s attempt=%s/%s in %ss: %s',
+                            model_name, attempt + 1, attempts, delay, error
+                        )
+                        time.sleep(delay)
+                    else:
+                        app.logger.warning(
+                            'Gemini model=%s failed after %s attempts: %s',
+                            model_name, attempts, error
+                        )
+            if response and (response.text or '').strip():
+                break
+
+        if not response or not (response.text or '').strip():
+            app.logger.error('All configured Gemini models failed: %s', last_error)
+            return jsonify(
+                ok=False,
+                error='Gemini กำลังมีผู้ใช้งานหนาแน่นหรือไม่พร้อมให้บริการชั่วคราว กรุณารอสักครู่แล้วลองใหม่'
+            ), 503
+
+        answer = response.text.strip()
         return jsonify(ok=True, reply=answer)
     except Exception:
         app.logger.exception('Gemini chatbot request failed')
-        return jsonify(ok=False, error='เชื่อมต่อ Gemini ไม่สำเร็จ กรุณาลองใหม่ภายหลัง'), 502
+        return jsonify(ok=False, error='เชื่อมต่อ Gemini ไม่สำเร็จ กรุณาตรวจสอบการตั้งค่า API แล้วลองใหม่'), 502
 
 
 @app.post('/api/register')
