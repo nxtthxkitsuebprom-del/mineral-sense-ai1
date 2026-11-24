@@ -1,17 +1,211 @@
-/* Gemini Soil Advisor - always visible on Dashboard */
-.gemini-advisor{margin:18px 0 26px;background:linear-gradient(135deg,#fbfff4,#f1f8e8)}
-.gemini-advisor-status{margin:12px 0;padding:10px 13px;border-radius:10px;background:#fff;border:1px solid #dce8cf;font-size:13px}
-.gemini-quick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.gemini-quick button{border:1px solid #b7d4a5;background:#fff;color:#245d31;border-radius:20px;padding:9px 13px;cursor:pointer}
-.gemini-crop-input{display:grid;gap:6px;margin:12px 0}
-.gemini-crop-input label{font-size:13px}
-.gemini-crop-input input{width:100%;box-sizing:border-box;border:1px solid #d6dfcc;border-radius:10px;padding:11px;font:inherit}
-.gemini-chat-log{display:flex;flex-direction:column;gap:9px;max-height:340px;overflow:auto;padding:12px;background:#fff;border:1px solid #e2eadb;border-radius:12px}
-.gemini-message{max-width:90%;padding:10px 13px;border-radius:12px;font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
-.gemini-message.assistant{align-self:flex-start;background:#edf5e8;color:#233a2b}
-.gemini-message.user{align-self:flex-end;background:#267b3c;color:#fff}
-.gemini-chat-form{display:flex;align-items:flex-end;gap:9px;margin-top:10px}
-.gemini-chat-form textarea{flex:1;min-width:0;resize:vertical;border:1px solid #d6dfcc;border-radius:10px;padding:11px;font:inherit}
-.gemini-chat-form button{min-height:42px}
-.gemini-disclaimer{display:block;margin-top:10px;color:#687365;line-height:1.5}
-@media(max-width:600px){.gemini-chat-form{flex-direction:column;align-items:stretch}.gemini-chat-form button{width:100%}}
+
+/* Gemini Soil Advisor - Mineral Sense AI
+   โหลดหลัง styles.css ตามที่ dashboard.html กำหนด */
+.gemini-advisor {
+  display: block;
+  margin: 24px 0;
+  padding: 28px !important;
+  border: 2px solid #d9b579;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fffdf4 0%, #f1f8e4 100%);
+  box-shadow: 0 8px 24px rgba(76, 91, 45, .12);
+  color: #263a22 !important;
+}
+.gemini-advisor,
+.gemini-advisor * {
+  box-sizing: border-box;
+}
+.gemini-advisor .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.gemini-advisor .panel-title > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 1px solid #d9b579;
+  border-radius: 17px;
+  background: #e8f5d5;
+  font-size: 30px;
+}
+.gemini-advisor .panel-title h2 {
+  margin: 0;
+  color: #285d24 !important;
+  font: 600 clamp(19px, 2.2vw, 25px)/1.4 'Mitr', sans-serif;
+}
+.gemini-advisor .panel-title .muted {
+  margin-top: 5px;
+  color: #66745d !important;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.gemini-advisor .eyebrow {
+  margin: 0 0 4px;
+  color: #66854e !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.gemini-advisor-status {
+  margin: 14px 0;
+  padding: 12px 15px;
+  border: 1px solid #dce8c9;
+  border-radius: 13px;
+  background: #f2f7e8;
+  color: #46623a !important;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.gemini-advisor-status[data-has-data="true"] {
+  border-color: #b8d6a0;
+  background: #eaf5df;
+}
+.gemini-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 14px 0 18px;
+}
+.gemini-quick button {
+  min-height: 42px;
+  padding: 9px 15px;
+  border: 1px solid #c6dba9;
+  border-radius: 24px;
+  background: #fffef8;
+  color: #315f2c !important;
+  font: 500 14px 'Kanit', sans-serif;
+  cursor: pointer;
+  transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.gemini-quick button:hover {
+  background: #eaf5dc;
+  box-shadow: 0 3px 10px rgba(49, 95, 44, .12);
+  transform: translateY(-1px);
+}
+.gemini-crop-input {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0;
+}
+.gemini-crop-input label {
+  color: #4d6042 !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+.gemini-crop-input input,
+.gemini-chat-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8dfc9;
+  border-radius: 13px;
+  outline: none;
+  background: #fff;
+  color: #263a22 !important;
+  font: 400 15px/1.6 'Kanit', sans-serif;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.gemini-crop-input input {
+  min-height: 46px;
+  padding: 10px 14px;
+}
+.gemini-chat-form textarea {
+  min-height: 58px;
+  max-height: 180px;
+  resize: vertical;
+  padding: 12px 14px;
+}
+.gemini-crop-input input:focus,
+.gemini-chat-form textarea:focus {
+  border-color: #76a95b;
+  box-shadow: 0 0 0 3px rgba(118, 169, 91, .16);
+}
+.gemini-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 130px;
+  max-height: 390px;
+  overflow-y: auto;
+  margin: 14px 0;
+  padding: 16px;
+  border: 1px solid #e1e8d6;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, .72);
+  scroll-behavior: smooth;
+}
+.gemini-message {
+  width: fit-content;
+  max-width: min(88%, 760px);
+  padding: 11px 15px;
+  border-radius: 16px;
+  color: #263a22 !important;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.gemini-message.assistant {
+  align-self: flex-start;
+  border: 1px solid #e0e8d4;
+  border-bottom-left-radius: 5px;
+  background: #f5f8ee;
+}
+.gemini-message.user {
+  align-self: flex-end;
+  border: 1px solid #2d873c;
+  border-bottom-right-radius: 5px;
+  background: #2d873c;
+  color: #fff !important;
+}
+.gemini-chat-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin-top: 12px;
+}
+.gemini-chat-form .btn,
+.gemini-chat-form button {
+  min-height: 48px;
+  padding: 11px 22px;
+  border: 0;
+  border-radius: 25px;
+  background: linear-gradient(180deg, #4bbd36, #16802a);
+  color: #fff !important;
+  font: 600 15px 'Kanit', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 5px 13px rgba(34, 116, 43, .18);
+}
+.gemini-chat-form button:disabled,
+.gemini-quick button:disabled {
+  opacity: .55;
+  cursor: wait;
+  transform: none;
+}
+.gemini-disclaimer {
+  display: block;
+  margin-top: 12px;
+  color: #7b765f !important;
+  font-size: 11px;
+  line-height: 1.7;
+}
+@media (max-width: 600px) {
+  .gemini-advisor { padding: 17px !important; }
+  .gemini-advisor .panel-title { align-items: flex-start; gap: 10px; }
+  .gemini-advisor .panel-title > span {
+    flex-basis: 46px; width: 46px; height: 46px; font-size: 24px;
+  }
+  .gemini-advisor .panel-title .muted { font-size: 12px; }
+  .gemini-quick { display: grid; grid-template-columns: 1fr; }
+  .gemini-quick button { width: 100%; text-align: left; }
+  .gemini-chat-log { min-height: 120px; max-height: 330px; padding: 11px; }
+  .gemini-message { max-width: 94%; font-size: 13px; }
+  .gemini-chat-form { grid-template-columns: 1fr; }
+  .gemini-chat-form button { width: 100%; }
+}
