@@ -40,6 +40,33 @@
 <section class="analysis-grid"><article class="farm-panel soil-summary"><div class="panel-title"><span>🌱</span><div><p class="eyebrow">SOIL PROFILE</p><h2>สภาพกรด-ด่างและความอุดมสมบูรณ์ของดิน</h2></div></div><div class="soil-result"><div class="soil-icon">🌾</div><div><b id="soil-type">รอผลวิเคราะห์</b><p id="soil-detail">เมื่อกล้องส่งค่าครบ ระบบจะสรุปสภาพกรด-ด่างและระดับธาตุอาหาร</p></div></div><div class="fertility-line"><span>ระดับธาตุอาหาร</span><b id="fertility-label">ยังไม่ประเมิน</b></div><div id="nutrient-status" class="nutrient-status-list">รอผลตรวจ NPK</div></article>
 <article class="farm-panel improve-panel"><div class="panel-title"><span>🧑‍🌾</span><div><p class="eyebrow">SOIL CARE</p><h2>คำแนะนำปรับปรุงดิน</h2></div></div><ul id="soil-recommendations" class="recommendation-list"><li>รอผลตรวจเพื่อแสดงคำแนะนำ</li></ul></article></section>
 
+
+<section class="farm-panel soil-advisor-panel" id="soil-advisor-panel" hidden aria-live="polite">
+  <div class="soil-advisor-heading">
+    <div class="soil-advisor-avatar" aria-hidden="true">🤖</div>
+    <div>
+      <p class="eyebrow">GEMINI AI SOIL ADVISOR</p>
+      <h2>ต้องการสูตรปุ๋ยหรือคำแนะนำเพิ่มเติมไหม?</h2>
+      <p class="muted">Gemini จะอ้างอิงเฉพาะค่า pH, N, P และ K ที่กล้องอ่านได้ครบในรอบปัจจุบัน</p>
+    </div>
+  </div>
+  <div class="soil-advisor-actions">
+    <button type="button" class="soil-advisor-choice" data-advisor-q="ช่วยวิเคราะห์ผลตรวจดินจากกล้องนี้ และแนะนำแนวทางปรับปรุงดิน">🌱 แนะนำวิธีปรับปรุงดิน</button>
+    <button type="button" class="soil-advisor-choice" data-advisor-q="ช่วยแนะนำแนวทางสูตรปุ๋ยตามผลตรวจดินนี้ โดยบอกข้อมูลที่ต้องทราบเพิ่มก่อนคำนวณอัตราใช้">🧪 ขอแนวทางสูตรปุ๋ย</button>
+    <button type="button" class="soil-advisor-choice" data-advisor-q="ช่วยอธิบายความหมายของค่า pH, N, P และ K ที่เครื่องตรวจได้">📊 อธิบายผลตรวจดิน</button>
+  </div>
+  <label class="soil-advisor-label" for="soil-advisor-crop">ชนิดพืชที่ปลูก (ไม่บังคับ)</label>
+  <input id="soil-advisor-crop" class="soil-advisor-input" type="text" maxlength="100" placeholder="เช่น ข้าว มะม่วง ทุเรียน หรือผัก">
+  <div id="soil-advisor-log" class="soil-advisor-log" aria-live="polite">
+    <p class="soil-advisor-empty">ตรวจวัดครบแล้ว เลือกหัวข้อด้านบนหรือพิมพ์คำถามเพื่อเริ่มคุยกับ Gemini ได้เลยครับ</p>
+  </div>
+  <form id="soil-advisor-form" class="soil-advisor-form">
+    <textarea id="soil-advisor-question" maxlength="1500" rows="2" placeholder="พิมพ์คำถามเพิ่มเติมเกี่ยวกับดินของคุณ..."></textarea>
+    <button id="soil-advisor-send" class="btn btn-primary" type="submit">ส่งคำถาม</button>
+  </form>
+  <p class="soil-advisor-note">หมายเหตุ: ค่า NPK จากการอ่านสีเป็นระดับคัดกรองเบื้องต้น ไม่ใช่ผลแล็บหรืออัตราปุ๋ยที่สอบเทียบแล้ว</p>
+</section>
+
 <section class="farm-panel crop-panel"><div class="panel-title"><span>🌿</span><div><p class="eyebrow">SMART CROP RECOMMENDATION</p><h2>พืชที่เหมาะสมกับดินของคุณ</h2><p class="muted">คำแนะนำพืชเบื้องต้นจากค่า pH และค่า NPK เมื่อผ่านการสอบเทียบ</p></div></div><div id="crop-results" class="crop-grid"><div class="crop-empty">🌱<b>รอผลตรวจดิน</b><span>เมื่ออ่านค่า pH, N, P และ K ครบ ระบบจะแนะนำพืช 3–5 ชนิด</span></div></div></section>
 <section class="farm-panel soil-types-panel"><div class="panel-title"><span>🌾</span><div><p class="eyebrow">SOIL KNOWLEDGE</p><h2>ลักษณะและวิธีปรับปรุงดินแต่ละประเภท</h2></div></div><div class="soil-type-grid"><article><span>🏖️</span><h3>ดินทราย</h3><p>เม็ดดินหยาบ ร่วนซุย น้ำซึมเร็วและแห้งไว</p><b>วิธีปรับปรุง</b><p>เติมปุ๋ยหมัก ปุ๋ยคอก คลุมดิน และแบ่งใส่ปุ๋ยเป็นครั้งย่อยเพื่อลดการชะล้าง</p></article><article><span>🧱</span><h3>ดินเหนียว</h3><p>เนื้อละเอียด อุ้มน้ำมาก อาจแน่นและระบายน้ำช้า</p><b>วิธีปรับปรุง</b><p>เพิ่มอินทรียวัตถุ ใช้แกลบหรือวัสดุปรับโครงสร้าง และจัดทางระบายน้ำ</p></article><article><span>🌿</span><h3>ดินร่วน</h3><p>ผสมทราย ทรายแป้ง และดินเหนียวในสัดส่วนสมดุล</p><b>วิธีดูแล</b><p>เติมอินทรียวัตถุสม่ำเสมอ ปลูกพืชหมุนเวียน และหลีกเลี่ยงการใส่ปุ๋ยเกินจำเป็น</p></article><article><span>🪵</span><h3>ดินเปรี้ยวจัด / ดินอินทรีย์</h3><p>มีความเป็นกรดสูง อาจมีอินทรียวัตถุสะสมมาก</p><b>วิธีปรับปรุง</b><p>ตรวจ pH และความต้องการปูนก่อนใช้โดโลไมท์หรือปูนปรับสภาพ พร้อมจัดการน้ำ</p></article></div></section>
 <section class="farm-panel crop-library"><div class="panel-title"><span>🍉</span><div><p class="eyebrow">CROP GUIDE</p><h2>ตัวอย่างพืช ผัก ผลไม้ และพืชไร่</h2></div></div><div class="crop-library-grid"><article><span>🌾</span><h3>ข้าว</h3><p>พืชไร่/นาข้าว · ต้องจัดการน้ำและเลือกพันธุ์ให้เหมาะกับพื้นที่</p></article><article><span>🌽</span><h3>ข้าวโพด</h3><p>พืชไร่ · ต้องการแสงดี ดินระบายน้ำ และธาตุอาหารเพียงพอ</p></article><article><span>🥔</span><h3>มันสำปะหลัง</h3><p>พืชไร่/พืชหัว · เหมาะกับดินระบายน้ำดี ไม่ควรมีน้ำขัง</p></article><article><span>🥬</span><h3>คะน้าและผักใบ</h3><p>พืชผัก · ต้องการ N พอเหมาะและน้ำสม่ำเสมอ ระวัง N มากเกิน</p></article><article><span>🍌</span><h3>กล้วย</h3><p>ไม้ผล · ต้องการน้ำและโพแทสเซียมค่อนข้างมาก พร้อมอินทรียวัตถุ</p></article><article><span>🥭</span><h3>มะม่วง</h3><p>ไม้ผล · เลือกพันธุ์และระยะปลูกตามพื้นที่ จัดการน้ำตามระยะเติบโต</p></article><article><span>🍈</span><h3>มะละกอ</h3><p>ไม้ผล · ต้องการแดดจัดและดินระบายน้ำดี ไม่ชอบน้ำขัง</p></article><article><span>🧅</span><h3>หอมหัวใหญ่ / กระเทียม</h3><p>พืชหัว · ต้องการดินโปร่ง ระบายน้ำดี และจัดการปุ๋ยตามระยะ</p></article><article><span>🍅</span><h3>มะเขือเทศ</h3><p>พืชผักกินผล · ต้องการ P และ K เพียงพอ รวมถึงน้ำสม่ำเสมอ</p></article></div></section>
