@@ -13,10 +13,65 @@
   let history = [];
   let busy = false;
 
+  function appendInline(parent, text) {
+    // Render only a small safe Markdown subset; never inject model text as HTML.
+    const parts = String(text).split(/(\\*\\*[^*]+\\*\\*|`[^`]+`)/g);
+    for (const part of parts) {
+      if (!part) continue;
+      if (part.startsWith("**") && part.endsWith("**")) {
+        const strong = document.createElement("strong");
+        strong.textContent = part.slice(2, -2);
+        parent.appendChild(strong);
+      } else if (part.startsWith("`") && part.endsWith("`")) {
+        const code = document.createElement("code");
+        code.textContent = part.slice(1, -1);
+        parent.appendChild(code);
+      } else {
+        parent.appendChild(document.createTextNode(part));
+      }
+    }
+  }
+
+  function renderAssistantMessage(el, text) {
+    el.replaceChildren();
+    const lines = String(text ?? "").replace(/\\r/g, "").split("\\n");
+    let list = null;
+    let listType = "";
+    const closeList = () => { list = null; listType = ""; };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line) { closeList(); continue; }
+      const bullet = line.match(/^(?:[-*•])\\s+(.+)$/);
+      const numbered = line.match(/^\\d+[.)]\\s+(.+)$/);
+      if (bullet || numbered) {
+        const type = bullet ? "ul" : "ol";
+        if (!list || listType !== type) {
+          closeList();
+          list = document.createElement(type);
+          el.appendChild(list);
+          listType = type;
+        }
+        const item = document.createElement("li");
+        appendInline(item, (bullet || numbered)[1]);
+        list.appendChild(item);
+        continue;
+      }
+      closeList();
+      const heading = line.match(/^#{1,3}\\s+(.+)$/);
+      const block = document.createElement(heading ? "div" : "p");
+      if (heading) block.className = "gemini-answer-heading";
+      appendInline(block, heading ? heading[1] : line);
+      el.appendChild(block);
+    }
+  }
+
   function addMessage(text, role) {
     const el = document.createElement("div");
-    el.className = "gemini-message " + (role === "user" ? "user" : "assistant");
-    el.textContent = String(text ?? "");
+    const isAssistant = role !== "user";
+    el.className = "gemini-message " + (isAssistant ? "assistant" : "user");
+    if (isAssistant) renderAssistantMessage(el, text);
+    else el.textContent = String(text ?? "");
     log.appendChild(el);
     log.scrollTop = log.scrollHeight;
     return el;
@@ -77,7 +132,7 @@
     send.disabled = true;
     input.disabled = true;
     addMessage(message, "user");
-    const pending = addMessage("กำลังส่งคำถามและตรวจสอบผลวัดล่าสุด...", "assistant");
+    const pending = addMessage("กำลังวิเคราะห์คำถามและผลตรวจจากเครื่อง...", "assistant");
 
     try {
       // Backend อ่านค่าจาก camera_live_values โดยตรง จึงไม่ต้องเรียก /api/data ซ้ำก่อนแชต
@@ -93,10 +148,10 @@
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || "ไม่สามารถรับคำตอบจาก Gemini ได้");
-      pending.textContent = data.reply || "Gemini ไม่ได้ส่งข้อความตอบกลับ";
+      renderAssistantMessage(pending, data.reply || "Gemini ไม่ได้ส่งข้อความตอบกลับ");
       history.push(
         { role: "user", text: message },
-        { role: "model", text: pending.textContent }
+        { role: "model", text: data.reply || "Gemini ไม่ได้ส่งข้อความตอบกลับ" }
       );
       history = history.slice(-4);
     } catch (error) {
