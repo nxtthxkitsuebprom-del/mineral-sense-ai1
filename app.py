@@ -1,5 +1,6 @@
 """Shared-camera Soil Nutrient Analyzer web application."""
 import base64, binascii, json, os, re, sqlite3, secrets, threading, time
+import urllib.request, urllib.error, urllib.parse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -337,7 +338,7 @@ def health(): return jsonify(ok=True, service='soil-nutrient-analyzer')
 # ---- Gemini AI chatbot (สมาชิกที่เข้าสู่ระบบเท่านั้น) ----
 _CHAT_REQUESTS = {}
 _CHAT_LOCK = threading.Lock()
-CHAT_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.8-flash').strip()
+CLOUDFLARE_MODEL = os.getenv('CLOUDFLARE_MODEL', '@cf/google/gemma-4-26b-a4b-it').strip()
 CHAT_SYSTEM_PROMPT = """
 คุณคือ Mineral Sens AI ผู้ช่วยด้านวิทยาศาสตร์ดินและการเกษตร ตอบภาษาไทยเป็นหลัก
 
@@ -383,9 +384,10 @@ def chatbot_api():
     if len(message) > 1500:
         return jsonify(ok=False, error='ข้อความยาวเกิน 1,500 ตัวอักษร'), 400
 
-    api_key = os.getenv('GEMINI_API_KEY', '').strip()
-    if not api_key:
-        return jsonify(ok=False, error='ผู้ดูแลระบบยังไม่ได้ตั้งค่า Gemini API Key'), 503
+    cf_token = os.getenv('CLOUDFLARE_API_TOKEN', '').strip()
+    cf_account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID', '').strip()
+    if not cf_token or not cf_account_id:
+        return jsonify(ok=False, error='ผู้ดูแลระบบยังไม่ได้ตั้งค่า Cloudflare Workers AI Token หรือ Account ID'), 503
 
     # จำกัดความถี่เบื้องต้นต่อบัญชี เพื่อป้องกันการเรียก API ถี่เกินไป
     username = session['username']
@@ -493,51 +495,91 @@ def chatbot_api():
     )
 
     try:
-        from google import genai
-        from google.genai import types
-
-        # จำกัดเวลารอจาก Gemini และไม่ retry หลายรอบจนผู้ใช้รอนาน
-        client = genai.Client(
-            api_key=api_key,
-            http_options=types.HttpOptions(timeout=45000)
+        model_path = urllib.parse.quote(CLOUDFLARE_MODEL, safe='@/.-')
+        endpoint = (
+            f"https://api.cloudflare.com/client/v4/accounts/"
+            f"{cf_account_id}/ai/run/{model_path}"
         )
-        response = client.models.generate_content(
-            model=CHAT_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=CHAT_SYSTEM_PROMPT,
-                temperature=0.2,
-                max_output_tokens=1800
+        request_body = {
+            "messages": [
+                {"role": "system", "content": CHAT_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.2,
+            "max_tokens": 1500,
+            "options": {"rejectIfBusy": True}
+        }
+        req = urllib.request.Request(
+            endpoint,
+            data=json.dumps(request_body, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {cf_token}",
+                "Content-Type": "application/json"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=55) as api_response:
+            provider_data = json.loads(api_response.read().decode("utf-8"))
+
+        result_data = provider_data.get("result") or {}
+        answer = str(result_data.get("response") or "").strip()
+        if not answer:
+            choices = result_data.get("choices") or []
+            if choices:
+                answer = str(
+                    ((choices[0].get("message") or {}).get("content")) or ""
+                ).strip()
+
+        if not answer:
+            app.logger.warning(
+                "Cloudflare Workers AI returned an empty response: %s",
+                json.dumps(provider_data, ensure_ascii=False)[:1200]
             )
+            return jsonify(
+                ok=False,
+                error='Workers AI ยังไม่สามารถสร้างคำตอบได้ กรุณาลองใหม่อีกครั้ง'
+            ), 503
+
+        return jsonify(ok=True, reply=answer, provider='cloudflare-workers-ai')
+
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace")[:1500]
+        app.logger.error(
+            "Cloudflare Workers AI HTTP error %s: %s",
+            exc.code, error_body
         )
-
-        if not response or not (response.text or '').strip():
-            app.logger.warning('Gemini returned an empty response')
+        if exc.code == 429:
             return jsonify(
                 ok=False,
-                error='Gemini ยังไม่สามารถสร้างคำตอบได้ กรุณาลองใหม่อีกครั้ง'
+                error='ขณะนี้ Cloudflare Workers AI ใช้งานหนาแน่นหรือถึงขีดจำกัดชั่วคราว กรุณารอสักครู่แล้วลองใหม่'
+            ), 429
+        if exc.code in (401, 403):
+            return jsonify(
+                ok=False,
+                error='Cloudflare ปฏิเสธการยืนยันตัวตน กรุณาตรวจสอบ API Token, Account ID และสิทธิ์ Workers AI Read/Edit'
+            ), 502
+        if exc.code >= 500:
+            return jsonify(
+                ok=False,
+                error='Cloudflare Workers AI ขัดข้องชั่วคราว กรุณาลองใหม่ภายหลัง'
             ), 503
-
-        answer = response.text.strip()
-        return jsonify(ok=True, reply=answer)
-    except Exception as exc:
-        app.logger.exception('Gemini chatbot request failed')
-        # แยกกรณีโมเดลไม่พร้อม/หมดเวลาออกจากปัญหา API key เพื่อไม่ให้ผู้ใช้ตั้งค่าผิดโดยไม่จำเป็น
-        error_text = str(exc).upper()
-        status_code = getattr(exc, 'code', None) or getattr(exc, 'status_code', None)
-        if status_code == 503 or '503' in error_text or 'UNAVAILABLE' in error_text or 'HIGH DEMAND' in error_text:
-            return jsonify(
-                ok=False,
-                error='ขณะนี้ Gemini มีผู้ใช้งานหนาแน่น ระบบยังไม่ได้รับคำตอบ กรุณารอสักครู่แล้วลองส่งใหม่เพียงครั้งเดียว'
-            ), 503
-        if 'TIMEOUT' in error_text or 'TIMED OUT' in error_text or 'DEADLINE' in error_text:
-            return jsonify(
-                ok=False,
-                error='Gemini ใช้เวลาตอบนานเกินกำหนด กรุณาลองใหม่อีกครั้งในภายหลัง'
-            ), 504
         return jsonify(
             ok=False,
-            error='เชื่อมต่อ Gemini ไม่สำเร็จชั่วคราว กรุณาลองใหม่ภายหลัง หากเกิดซ้ำให้ตรวจสอบ Log ของระบบ'
+            error=f'Cloudflare Workers AI ตอบกลับข้อผิดพลาด HTTP {exc.code}'
+        ), 502
+
+    except (TimeoutError, urllib.error.URLError) as exc:
+        app.logger.warning("Cloudflare Workers AI connection/timeout: %s", exc)
+        return jsonify(
+            ok=False,
+            error='Cloudflare Workers AI ใช้เวลาตอบนานเกินกำหนด กรุณาลองใหม่อีกครั้ง'
+        ), 504
+
+    except Exception:
+        app.logger.exception('Cloudflare Workers AI chatbot request failed')
+        return jsonify(
+            ok=False,
+            error='เชื่อมต่อ Cloudflare Workers AI ไม่สำเร็จ กรุณาตรวจสอบ Logs ของระบบ'
         ), 502
 
 
