@@ -520,9 +520,25 @@ def chatbot_api():
 
         answer = response.text.strip()
         return jsonify(ok=True, reply=answer)
-    except Exception:
+    except Exception as exc:
         app.logger.exception('Gemini chatbot request failed')
-        return jsonify(ok=False, error='เชื่อมต่อ Gemini ไม่สำเร็จ กรุณาตรวจสอบการตั้งค่า API แล้วลองใหม่'), 502
+        # แยกกรณีโมเดลไม่พร้อม/หมดเวลาออกจากปัญหา API key เพื่อไม่ให้ผู้ใช้ตั้งค่าผิดโดยไม่จำเป็น
+        error_text = str(exc).upper()
+        status_code = getattr(exc, 'code', None) or getattr(exc, 'status_code', None)
+        if status_code == 503 or '503' in error_text or 'UNAVAILABLE' in error_text or 'HIGH DEMAND' in error_text:
+            return jsonify(
+                ok=False,
+                error='ขณะนี้ Gemini มีผู้ใช้งานหนาแน่น ระบบยังไม่ได้รับคำตอบ กรุณารอสักครู่แล้วลองส่งใหม่เพียงครั้งเดียว'
+            ), 503
+        if 'TIMEOUT' in error_text or 'TIMED OUT' in error_text or 'DEADLINE' in error_text:
+            return jsonify(
+                ok=False,
+                error='Gemini ใช้เวลาตอบนานเกินกำหนด กรุณาลองใหม่อีกครั้งในภายหลัง'
+            ), 504
+        return jsonify(
+            ok=False,
+            error='เชื่อมต่อ Gemini ไม่สำเร็จชั่วคราว กรุณาลองใหม่ภายหลัง หากเกิดซ้ำให้ตรวจสอบ Log ของระบบ'
+        ), 502
 
 
 @app.post('/api/register')
