@@ -400,3 +400,195 @@ body { font-size: 17px; line-height: 1.65; }
   .gemini-chat-form { grid-template-columns: 1fr; }
   .gemini-chat-form button { width: 100%; }
 }
+
+
+/* ===== Mobile-first responsive refinements ===== */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { min-width: 320px; overflow-x: hidden; }
+img, canvas, video, iframe { max-width: 100%; }
+input, select, textarea, button { max-width: 100%; font: inherit; }
+button, a, summary { -webkit-tap-highlight-color: transparent; }
+.farm-main, .page, .admin-wrap { min-width: 0; }
+.farm-main { width: min(1180px, calc(100% - 40px)); }
+.farm-panel, .nutrient-card, .analysis-grid > *, .crop-card,
+.soil-type-grid article, .crop-library-grid article { min-width: 0; }
+.analysis-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nutrient-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.crop-grid { grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
+.soil-type-grid, .crop-library-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.standard-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.gemini-chat-log { min-width: 0; }
+.gemini-message { overflow-wrap: anywhere; }
+.history-chart-panel canvas { display: block; width: 100% !important; }
+.admin-panel { max-width: 100%; }
+.admin-panel table { min-width: 620px; }
+.admin-panel { overflow-x: auto; }
+
+/* Accessible dropdown menu shared by all site pages */
+.topbar .mobile-menu { position: relative; }
+.topbar .mobile-menu > summary {
+  display: none;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.topbar .mobile-menu > summary::-webkit-details-marker { display: none; }
+
+@media (max-width: 900px) {
+  .farm-main { width: calc(100% - 32px); margin-top: 18px; }
+  .analysis-grid { grid-template-columns: minmax(0, 1fr); }
+  .soil-type-grid, .crop-library-grid, .standard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .project-decor { display: none; }
+  .scan-progress { min-width: 0; }
+  .farm-heading { gap: 14px; }
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    min-height: 64px;
+    height: auto;
+    padding: 9px 14px;
+    gap: 10px;
+  }
+  .topbar .brand { min-width: 0; max-width: calc(100% - 92px); gap: 8px; font-size: 15px; line-height: 1.25; }
+  .topbar .brand > span:last-child { min-width: 0; }
+  .topbar .brand small { font-size: 8px; letter-spacing: 1.3px; }
+  .topbar .brand-icon { flex: 0 0 38px; width: 38px; height: 38px; border-radius: 12px; font-size: 21px; }
+  .topbar .mobile-menu { margin-left: auto; flex: 0 0 auto; }
+  .topbar .mobile-menu > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 8px 13px;
+    border: 1px solid #d8c28e;
+    border-radius: 22px;
+    background: #fff4d5;
+    color: #315c22;
+    font: 500 14px 'Kanit', sans-serif;
+  }
+  .topbar .mobile-menu > summary .menu-icon { font-size: 18px; line-height: 1; }
+  .topbar .mobile-menu > nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 30;
+    width: min(245px, calc(100vw - 28px));
+    padding: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    border: 1px solid #e4d2a8;
+    border-radius: 16px;
+    background: #fffdf5;
+    box-shadow: 0 12px 30px rgba(35, 55, 25, .2);
+  }
+  .topbar .mobile-menu[open] > nav { display: flex; }
+  .topbar .mobile-menu > nav .nav-link {
+    display: block;
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: #315c22;
+    font-size: 15px;
+  }
+  .topbar .mobile-menu > nav .nav-link.active { background: #edf5df; }
+  .topbar .mobile-menu > nav .nav-logout {
+    width: 100%;
+    min-height: 42px;
+    margin-top: 4px;
+    font-size: 14px;
+  }
+  .page { padding: 20px 12px 42px; }
+  .farm-main { width: calc(100% - 24px); margin: 14px auto 38px; }
+  .project-banner { padding: 16px; gap: 11px; margin: 14px 0 20px; border-radius: 18px; }
+  .project-mark { width: 48px; height: 48px; flex-basis: 48px; font-size: 27px; border-radius: 14px; }
+  .project-banner h1 { font-size: clamp(17px, 5vw, 21px); overflow-wrap: anywhere; }
+  .project-banner p:last-child { font-size: 9px; letter-spacing: 1.7px; }
+  .farm-heading { align-items: stretch; flex-direction: column; margin: 22px 0 13px; }
+  .farm-heading h2, .section-heading h2 { font-size: 21px !important; }
+  .scan-progress { width: 100%; padding: 11px 12px; }
+  .scan-progress .btn { width: 100%; margin-top: 8px; }
+  .nutrient-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .nutrient-card { padding: 13px !important; border-radius: 16px; }
+  .nutrient-card h3 { font-size: 22px !important; }
+  .nutrient-card h3 small { display: block; font-size: 11px !important; }
+  .nutrient-card .tag { white-space: normal; font-size: 10px !important; }
+  .nutrient-symbol { font-size: 21px; }
+  .big-value { font-size: 31px !important; min-height: 40px; }
+  .color-readout, .card-foot { font-size: 12px !important; }
+  .farm-panel, .history-panel { padding: 17px !important; margin-top: 15px; border-radius: 18px; }
+  .panel-title { align-items: flex-start; gap: 10px; }
+  .panel-title > span { flex: 0 0 44px; }
+  .panel-title h2, .crop-panel .panel-title h2,
+  .soil-summary .panel-title h2, .improve-panel .panel-title h2 {
+    font-size: 19px !important;
+    line-height: 1.4;
+  }
+  .panel-title .muted { font-size: 12px !important; }
+  .soil-result { gap: 10px; }
+  .soil-result > div:last-child b { font-size: 19px !important; }
+  .soil-result p, .recommendation-list, .nutrient-status-list {
+    font-size: 14px !important;
+    line-height: 1.75 !important;
+  }
+  .soil-type-grid, .crop-library-grid, .standard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .soil-type-grid article, .crop-library-grid article { padding: 13px; }
+  .soil-type-grid h3, .crop-library-grid h3 { font-size: 16px; }
+  .soil-type-grid p, .crop-library-grid p { font-size: 12px; line-height: 1.65; }
+  .standard-grid > div { padding: 12px; min-width: 0; }
+  .standard-grid strong { font-size: 20px; }
+  .crop-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 11px !important; }
+  .crop-card { padding: 16px !important; min-height: 0; }
+  .crop-card h3 { font-size: 20px !important; }
+  .gemini-advisor { padding: 15px !important; margin: 16px 0; }
+  .gemini-advisor .panel-title { align-items: flex-start; }
+  .gemini-advisor .panel-title > span { flex: 0 0 42px; width: 42px; height: 42px; font-size: 22px; }
+  .gemini-advisor .panel-title h2 { font-size: 18px; }
+  .gemini-advisor-status { font-size: 13px; }
+  .gemini-quick { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gemini-quick button { width: 100%; min-height: 44px; text-align: left; font-size: 14px; }
+  .gemini-chat-log { min-height: 115px; max-height: 48vh; padding: 10px; }
+  .gemini-message { max-width: 100% !important; padding: 10px 12px; font-size: 13px !important; line-height: 1.7; }
+  .gemini-chat-form { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gemini-chat-form textarea { min-height: 82px; font-size: 16px; }
+  .gemini-chat-form button { width: 100%; min-height: 46px; }
+  .gemini-disclaimer { font-size: 10px; }
+  .history-chart-panel > div[style*="height"] { height: 250px !important; }
+  .history-row, .history-record-head { gap: 8px; }
+  .hist-vals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .manual-soil-form, .manual-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .comparison-output, .knowledge-columns { grid-template-columns: minmax(0, 1fr); }
+  .knowledge-hero { gap: 10px; }
+  .knowledge-hero h1 { font-size: 25px; }
+  .knowledge-mascot { font-size: 42px; }
+  .knowledge-question { padding: 14px; gap: 10px; }
+  .knowledge-question > span { font-size: 30px; }
+  .knowledge-crop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-card { align-items: flex-start; padding: 16px; }
+  .account-details { padding: 4px 14px; }
+  .detail-row { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .avatar-upload { align-items: flex-start; }
+  .avatar-upload-actions { min-width: 0; width: 100%; }
+  .admin-wrap { margin: 18px auto; padding: 0 12px; }
+  .admin-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-login { width: calc(100% - 24px); padding: 22px; }
+  .range-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-head { align-items: flex-start; }
+}
+
+@media (max-width: 380px) {
+  .topbar .brand { font-size: 13px; }
+  .topbar .mobile-menu > summary { padding: 7px 10px; }
+  .nutrient-card { padding: 11px !important; }
+  .tag { font-size: 9px !important; }
+  .soil-type-grid, .crop-library-grid, .standard-grid { grid-template-columns: minmax(0, 1fr); }
+  .manual-values { grid-template-columns: minmax(0, 1fr); }
+  .login-card { padding: 22px 16px; }
+}
