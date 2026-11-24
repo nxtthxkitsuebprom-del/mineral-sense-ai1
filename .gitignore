@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+*.sqlite3
+__pycache__/
+*.pyc
+.venv/
+venv/
+captured_tubes_hsv.json
+.cloudflare_tunnel_token.txt

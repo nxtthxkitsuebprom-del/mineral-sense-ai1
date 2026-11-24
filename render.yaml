@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: mineral-sens-ai
+    runtime: python
+    plan: starter
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 8 --timeout 120
+    healthCheckPath: /health
+    disk:
+      name: soil-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      # Add the Supabase Session Pooler URL in Render Environment.
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_PATH
+        value: /var/data/users.sqlite3
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: API_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>บัญชีของฉัน | น้องดิน</title><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/dashboard"><span class="brand-icon">🌱</span><span>น้องดิน<small>SOIL FRIEND</small></span></a>
+  <nav><a class="nav-link" href="/dashboard">หน้าหลัก</a><a class="nav-link" href="/knowledge">ความรู้เกษตร</a><a class="nav-link active" href="/account">บัญชีของฉัน</a><button class="nav-logout" data-logout>ออกจากระบบ</button></nav>
+</header>
+<main class="page account-page">
+  <section class="profile-card">
+    <div class="avatar" id="profile-avatar">🌻</div><div><p class="eyebrow">MY ACCOUNT</p><h2 id="profile-name">กำลังโหลด...</h2><button type="button" class="link-edit" id="edit-name-shortcut">✏️ แก้ไขชื่อ / รูปโปรไฟล์</button><p class="muted">สมาชิก Soil Friend</p></div>
+  </section>
+  <section class="account-details">
+    <div class="detail-row"><span>ชื่อผู้ใช้</span><b id="profile-username">-</b></div>
+    <div class="detail-row"><span>อีเมล</span><b id="profile-email">-</b></div>
+    <div class="detail-row"><span>สถานะบัญชี</span><b class="account-active">● เข้าสู่ระบบแล้ว</b></div>
+  </section>
+  <section class="farm-panel profile-edit">
+    <div class="panel-title"><span>✏️</span><div><p class="eyebrow">EDIT PROFILE</p><h2>แก้ไขโปรไฟล์</h2></div></div>
+    <form id="profile-form">
+      <label>ชื่อที่แสดง<input name="display_name" id="edit-name" maxlength="60" required></label>
+      <p class="eyebrow">รูปโปรไฟล์</p>
+      <div class="avatar-upload">
+        <div class="avatar avatar-preview" id="avatar-preview">🌻</div>
+        <div class="avatar-upload-actions">
+          <button type="button" class="btn btn-outline" id="avatar-upload-btn">📷 เลือกรูปจากเครื่อง</button>
+          <button type="button" class="btn btn-danger" id="avatar-remove-btn" hidden>ลบรูปที่อัปโหลด</button>
+          <input type="file" id="avatar-file" accept="image/jpeg,image/png,image/webp,image/*" hidden>
+          <p class="muted">เลือกรูปของคุณเอง ระบบจะย่อและครอปเป็นวงกลมให้อัตโนมัติ หรือเลือกไอคอนด้านล่างแทนก็ได้</p>
+        </div>
+      </div>
+      <div class="avatar-picker" id="avatar-picker"></div><input type="hidden" name="avatar" id="avatar-input">
+      <label>อีเมล (ไม่บังคับ)<input name="email" id="edit-email" type="email" maxlength="120" placeholder="you@example.com"></label>
+      <button class="btn btn-primary" type="submit">บันทึกโปรไฟล์</button>
+      <p class="form-error" id="profile-msg" aria-live="polite"></p>
+    </form>
+  </section>
+  <section class="farm-panel standard-panel"><div class="panel-title"><span>🔎</span><div><p class="eyebrow">ESTIMATED READING RANGE</p><h2>ช่วงค่าประมาณที่ระบบกล้องใช้เป็นแนวทาง</h2><p class="muted">ช่วงมาตรฐานสามารถปรับได้ที่หน้าแอดมิน และกล้องจะโหลดค่าใหม่อัตโนมัติ</p></div></div><div class="standard-grid"><div><b>pH</b><strong>1.00–9.00</strong><span>กรดจัดถึงด่างจัด · ค่าประมาณ</span></div><div><b>N · ไนโตรเจน</b><strong>70–125</strong><span>ช่วงประมาณ สูง</span></div><div><b>P · ฟอสฟอรัส</b><strong>20–60</strong><span>ช่วงประมาณ ปานกลาง</span></div><div><b>K · โพแทสเซียม</b><strong>140–180</strong><span>ช่วงประมาณ สูง</span></div></div><p class="standard-note">การเปลี่ยนช่วงค่า: เข้าหน้า /admin → มาตรฐานการอ่าน เพื่อแก้ไขและบันทึกได้ตลอดเวลา</p></section>
+  <div class="account-note">🌱 <div><b>เติบโตไปพร้อมกับดิน</b><p>ผลวิเคราะห์ล่าสุดของคุณจะอยู่ในหน้า “ผลวิเคราะห์” จนกว่าจะกดล้างผล</p></div></div>
+  <button class="btn btn-outline" data-logout>ออกจากระบบ</button>
+</main>
+<script src="/app.js"></script>
+<script src="/chatbot.js" defer></script>
+</body></html>

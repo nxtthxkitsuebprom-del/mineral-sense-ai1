@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เข้าสู่ระบบ | น้องดิน</title><link rel="stylesheet" href="/styles.css"></head>
+<body class="login-body"><main class="login-wrap login-scene"><div class="login-brand"><div class="login-sign">🌱 เครื่องวิเคราะห์แร่ธาตุในดิน</div><p>รู้ค่าดิน... เพื่อผลผลิตที่ดีกว่า</p></div><section class="login-card">
+<div class="mascot">👨🏻‍🌾</div><p class="eyebrow">SOIL NUTRIENT ANALYZER</p>
+<h1>เข้าสู่ระบบ<br><span>เกษตรกรยุคใหม่</span></h1>
+<div class="auth-tabs"><button class="auth-tab active" data-auth="login">เข้าสู่ระบบ</button><button class="auth-tab" data-auth="register">ลงทะเบียน</button><button class="auth-tab" data-auth="forgot">ลืมรหัสผ่าน</button></div>
+<p class="muted" id="auth-description">เข้าสู่ระบบเพื่อดูผลวิเคราะห์ pH, N, P และ K</p>
+<form id="login-form" data-auth-panel="login">
+<label>ชื่อผู้ใช้<input name="username" autocomplete="username" placeholder="กรอกชื่อผู้ใช้" required></label>
+<label>รหัสผ่าน<input name="password" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" required></label>
+<button class="btn btn-primary full" type="submit">เข้าสู่ระบบ →</button><p class="form-error" id="login-error" aria-live="polite"></p></form>
+<form id="register-form" data-auth-panel="register" hidden>
+<label>ชื่อที่แสดง<input name="display_name" placeholder="ชื่อ-นามสกุล" required></label>
+<label>ชื่อผู้ใช้<input name="username" autocomplete="username" minlength="3" required></label>
+<label>อีเมล (ไม่บังคับ)<input name="email" type="email" placeholder="you@example.com"></label>
+<label>รหัสผ่าน<input name="password" type="password" minlength="8" autocomplete="new-password" required></label>
+<button class="btn btn-primary full" type="submit">สร้างบัญชี</button><p class="form-error" id="register-error" aria-live="polite"></p></form>
+<div data-auth-panel="forgot" hidden class="form-note" style="text-align:left;margin-top:20px">เพื่อป้องกันผู้อื่นเปลี่ยนรหัสผ่านของคุณโดยไม่ได้รับอนุญาต กรุณาติดต่อผู้ดูแลเว็บไซต์เพื่อยืนยันตัวตนและรีเซ็ตรหัสผ่าน ระบบจะเพิ่มการยืนยันผ่านอีเมลเมื่อกำหนดค่าบริการส่งอีเมลแล้ว</div>
+</section><div class="login-benefits"><span>🌱 วิเคราะห์ดินแม่นยำ</span><span>📊 วางแผนใช้ปุ๋ย</span><span>🌾 เพิ่มผลผลิต</span></div><div class="login-decoration">เกษตรกรยุคใหม่ ใช้เทคโนโลยี เพื่ออนาคตที่ดีกว่า</div></main><script src="/app.js"></script></body></html>

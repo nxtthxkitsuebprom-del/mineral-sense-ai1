@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เครื่องวิเคราะห์แร่ธาตุในดิน | Soil Nutrient Analyzer</title><link rel="stylesheet" href="/styles.css">
+</head>
+<body class="farm-page">
+<header class="topbar farm-topbar"><a class="brand" href="/dashboard"><span class="brand-icon">🌱</span><span>เครื่องวิเคราะห์แร่ธาตุในดิน<small>SOIL NUTRIENT ANALYZER</small></span></a><nav><a class="nav-link active" href="/dashboard">หน้าหลัก</a><a class="nav-link" href="/knowledge">ความรู้เกษตร</a><a class="nav-link" href="/account">บัญชีผู้ใช้</a><button class="nav-logout" data-logout>ออกจากระบบ</button></nav></header>
+<main class="farm-main">
+<section class="project-banner"><div class="project-mark">🌱</div><div><p class="project-kicker">AGRICULTURE · SMART ANALYSIS</p><h1>โครงงานเครื่องวิเคราะห์ธาตุอาหารในดิน</h1><p>SOIL NUTRIENT ANALYZER</p></div><div class="project-decor">🌾　🪴　🌿</div></section>
+<section class="section-heading farm-heading"><div><p class="eyebrow">REAL-TIME SOIL REPORT</p><h2>ผลการวิเคราะห์ดิน</h2></div><div class="scan-progress"><b id="scan-progress-text">0 / 4 ค่า</b><div class="progress-track"><i id="scan-progress-bar"></i></div><button class="btn btn-danger" id="clear-results" type="button">ล้างค่าผลตรวจ</button></div></section>
+
+ 
+<!-- สถานะเครื่องวิเคราะห์ดิน -->
+<section class="farm-panel machine-status-panel">
+  <div class="panel-title">
+    <span>🔌</span>
+    <div>
+      <p class="eyebrow">DEVICE STATUS</p>
+      <h2>สถานะเครื่องวิเคราะห์ดิน</h2>
+    </div>
+  </div>
+
+  <p>
+    สถานะ:
+    <strong id="machine-status">กำลังตรวจสอบ...</strong>
+  </p>
+
+  <p class="muted" id="machine-last-seen">
+    ยังไม่มีข้อมูลการเชื่อมต่อล่าสุด
+  </p>
+</section>
+ 
+<section class="nutrient-grid farm-nutrients" id="nutrient-grid">
+<article class="nutrient-card ph"><div class="nutrient-top"><span class="nutrient-symbol">⚗️</span><span class="tag">ความเป็นกรด-ด่าง</span></div><h3>pH</h3><div class="big-value" data-value="pH"></div><p class="color-readout" data-color-label="pH">ค่าความเป็นกรด-ด่าง</p><div class="meter"><i data-meter="pH"></i></div><p class="card-foot">ช่วงอ้างอิงเบื้องต้น 0–14</p></article>
+<article class="nutrient-card n"><div class="nutrient-top"><span class="nutrient-symbol">🌿</span><span class="tag">ช่วยสร้างใบและลำต้น</span></div><h3>N <small>ไนโตรเจน</small></h3><div class="big-value" data-value="N"></div><p class="color-readout" data-color-label="N">ค่าไนโตรเจน</p><div class="meter"><i data-meter="N"></i></div><p class="card-foot">หน่วยตามชุดสอบเทียบจริง</p></article>
+<article class="nutrient-card p"><div class="nutrient-top"><span class="nutrient-symbol">🌼</span><span class="tag">ช่วยรากและดอก</span></div><h3>P <small>ฟอสฟอรัส</small></h3><div class="big-value" data-value="P"></div><p class="color-readout" data-color-label="P">ค่าฟอสฟอรัส</p><div class="meter"><i data-meter="P"></i></div><p class="card-foot">หน่วยตามชุดสอบเทียบจริง</p></article>
+<article class="nutrient-card k"><div class="nutrient-top"><span class="nutrient-symbol">🍅</span><span class="tag">ช่วยผลและความแข็งแรง</span></div><h3>K <small>โพแทสเซียม</small></h3><div class="big-value" data-value="K"></div><p class="color-readout" data-color-label="K">ค่าโพแทสเซียม</p><div class="meter"><i data-meter="K"></i></div><p class="card-foot">หน่วยตามชุดสอบเทียบจริง</p></article>
+</section>
+<section class="analysis-grid"><article class="farm-panel soil-summary"><div class="panel-title"><span>🌱</span><div><p class="eyebrow">SOIL PROFILE</p><h2>สภาพกรด-ด่างและความอุดมสมบูรณ์ของดิน</h2></div></div><div class="soil-result"><div class="soil-icon">🌾</div><div><b id="soil-type">รอผลวิเคราะห์</b><p id="soil-detail">เมื่อกล้องส่งค่าครบ ระบบจะสรุปสภาพกรด-ด่างและระดับธาตุอาหาร</p></div></div><div class="fertility-line"><span>ระดับธาตุอาหาร</span><b id="fertility-label">ยังไม่ประเมิน</b></div><div id="nutrient-status" class="nutrient-status-list">รอผลตรวจ NPK</div></article>
+<article class="farm-panel improve-panel"><div class="panel-title"><span>🧑‍🌾</span><div><p class="eyebrow">SOIL CARE</p><h2>คำแนะนำปรับปรุงดิน</h2></div></div><ul id="soil-recommendations" class="recommendation-list"><li>รอผลตรวจเพื่อแสดงคำแนะนำ</li></ul></article></section>
+
+<section class="farm-panel crop-panel"><div class="panel-title"><span>🌿</span><div><p class="eyebrow">SMART CROP RECOMMENDATION</p><h2>พืชที่เหมาะสมกับดินของคุณ</h2><p class="muted">คำแนะนำพืชเบื้องต้นจากค่า pH และค่า NPK เมื่อผ่านการสอบเทียบ</p></div></div><div id="crop-results" class="crop-grid"><div class="crop-empty">🌱<b>รอผลตรวจดิน</b><span>เมื่ออ่านค่า pH, N, P และ K ครบ ระบบจะแนะนำพืช 3–5 ชนิด</span></div></div></section>
+<section class="farm-panel soil-types-panel"><div class="panel-title"><span>🌾</span><div><p class="eyebrow">SOIL KNOWLEDGE</p><h2>ลักษณะและวิธีปรับปรุงดินแต่ละประเภท</h2></div></div><div class="soil-type-grid"><article><span>🏖️</span><h3>ดินทราย</h3><p>เม็ดดินหยาบ ร่วนซุย น้ำซึมเร็วและแห้งไว</p><b>วิธีปรับปรุง</b><p>เติมปุ๋ยหมัก ปุ๋ยคอก คลุมดิน และแบ่งใส่ปุ๋ยเป็นครั้งย่อยเพื่อลดการชะล้าง</p></article><article><span>🧱</span><h3>ดินเหนียว</h3><p>เนื้อละเอียด อุ้มน้ำมาก อาจแน่นและระบายน้ำช้า</p><b>วิธีปรับปรุง</b><p>เพิ่มอินทรียวัตถุ ใช้แกลบหรือวัสดุปรับโครงสร้าง และจัดทางระบายน้ำ</p></article><article><span>🌿</span><h3>ดินร่วน</h3><p>ผสมทราย ทรายแป้ง และดินเหนียวในสัดส่วนสมดุล</p><b>วิธีดูแล</b><p>เติมอินทรียวัตถุสม่ำเสมอ ปลูกพืชหมุนเวียน และหลีกเลี่ยงการใส่ปุ๋ยเกินจำเป็น</p></article><article><span>🪵</span><h3>ดินเปรี้ยวจัด / ดินอินทรีย์</h3><p>มีความเป็นกรดสูง อาจมีอินทรียวัตถุสะสมมาก</p><b>วิธีปรับปรุง</b><p>ตรวจ pH และความต้องการปูนก่อนใช้โดโลไมท์หรือปูนปรับสภาพ พร้อมจัดการน้ำ</p></article></div></section>
+<section class="farm-panel crop-library"><div class="panel-title"><span>🍉</span><div><p class="eyebrow">CROP GUIDE</p><h2>ตัวอย่างพืช ผัก ผลไม้ และพืชไร่</h2></div></div><div class="crop-library-grid"><article><span>🌾</span><h3>ข้าว</h3><p>พืชไร่/นาข้าว · ต้องจัดการน้ำและเลือกพันธุ์ให้เหมาะกับพื้นที่</p></article><article><span>🌽</span><h3>ข้าวโพด</h3><p>พืชไร่ · ต้องการแสงดี ดินระบายน้ำ และธาตุอาหารเพียงพอ</p></article><article><span>🥔</span><h3>มันสำปะหลัง</h3><p>พืชไร่/พืชหัว · เหมาะกับดินระบายน้ำดี ไม่ควรมีน้ำขัง</p></article><article><span>🥬</span><h3>คะน้าและผักใบ</h3><p>พืชผัก · ต้องการ N พอเหมาะและน้ำสม่ำเสมอ ระวัง N มากเกิน</p></article><article><span>🍌</span><h3>กล้วย</h3><p>ไม้ผล · ต้องการน้ำและโพแทสเซียมค่อนข้างมาก พร้อมอินทรียวัตถุ</p></article><article><span>🥭</span><h3>มะม่วง</h3><p>ไม้ผล · เลือกพันธุ์และระยะปลูกตามพื้นที่ จัดการน้ำตามระยะเติบโต</p></article><article><span>🍈</span><h3>มะละกอ</h3><p>ไม้ผล · ต้องการแดดจัดและดินระบายน้ำดี ไม่ชอบน้ำขัง</p></article><article><span>🧅</span><h3>หอมหัวใหญ่ / กระเทียม</h3><p>พืชหัว · ต้องการดินโปร่ง ระบายน้ำดี และจัดการปุ๋ยตามระยะ</p></article><article><span>🍅</span><h3>มะเขือเทศ</h3><p>พืชผักกินผล · ต้องการ P และ K เพียงพอ รวมถึงน้ำสม่ำเสมอ</p></article></div></section>
+
+<!-- กราฟเปรียบเทียบผลตรวจย้อนหลัง -->
+<section class="farm-panel history-chart-panel">
+  <div class="panel-title">
+    <span>📊</span>
+    <div>
+      <p class="eyebrow">SOIL ANALYSIS TRENDS</p>
+      <h2>กราฟเปรียบเทียบผลตรวจย้อนหลัง</h2>
+      <p class="muted">เปรียบเทียบค่า pH, N, P และ K จากประวัติผลตรวจ</p>
+    </div>
+  </div>
+
+  <div style="position:relative; height:320px;">
+    <canvas id="soil-history-chart"></canvas>
+  </div>
+  <p id="chart-status" class="muted">กำลังรอข้อมูลประวัติผลตรวจ...</p>
+</section>
+
+<!-- ดาวน์โหลดรายงาน -->
+<section class="farm-panel export-panel">
+  <div class="panel-title">
+    <span>📄</span>
+    <div>
+      <p class="eyebrow">EXPORT REPORT</p>
+      <h2>ดาวน์โหลดรายงานผลวิเคราะห์ดิน</h2>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <button class="btn" id="download-pdf" type="button">
+      📕 ดาวน์โหลด PDF
+    </button>
+    <button class="btn" id="download-excel" type="button">
+      📗 ดาวน์โหลด Excel
+    </button>
+  </div>
+</section>
+
+<section class="farm-panel history-panel"><div class="panel-title"><span>📚</span><div><p class="eyebrow">YOUR RECORDS</p><h2>ประวัติการตรวจอัตโนมัติของฉัน</h2><p class="muted">จำนวนรอบที่บันทึกอัตโนมัติ: <b id="history-count">0</b> ครั้ง</p></div></div><div id="scan-history">กำลังโหลดประวัติ...</div></section>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script src="/app.js"></script>
+ <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="/chatbot.js" defer></script>
+</body>
+</html>
