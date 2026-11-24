@@ -1,5 +1,5 @@
 """Shared-camera Soil Nutrient Analyzer web application."""
-import base64, binascii, json, os, re, sqlite3, secrets, threading, time
+import base64, binascii, json, math, os, re, sqlite3, secrets, threading, time
 from dotenv import load_dotenv
 
 load_dotenv()
