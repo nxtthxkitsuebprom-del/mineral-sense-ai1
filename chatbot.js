@@ -15,14 +15,15 @@
 
   function appendInline(parent, text) {
     // Render only a small safe Markdown subset; never inject model text as HTML.
-    const parts = String(text).split(/(\\*\\*[^*]+\\*\\*|`[^`]+`)/g);
+    const tick = String.fromCharCode(96);
+    const parts = String(text).split(/(\*\*[^*]+\*\*|\x60[^\x60]+\x60)/g);
     for (const part of parts) {
       if (!part) continue;
       if (part.startsWith("**") && part.endsWith("**")) {
         const strong = document.createElement("strong");
         strong.textContent = part.slice(2, -2);
         parent.appendChild(strong);
-      } else if (part.startsWith("`") && part.endsWith("`")) {
+      } else if (part.startsWith(tick) && part.endsWith(tick)) {
         const code = document.createElement("code");
         code.textContent = part.slice(1, -1);
         parent.appendChild(code);
@@ -34,7 +35,7 @@
 
   function renderAssistantMessage(el, text) {
     el.replaceChildren();
-    const lines = String(text ?? "").replace(/\\r/g, "").split("\\n");
+    const lines = String(text ?? "").replace(/\r/g, "").split("\n");
     let list = null;
     let listType = "";
     const closeList = () => { list = null; listType = ""; };
@@ -42,8 +43,8 @@
     for (const rawLine of lines) {
       const line = rawLine.trim();
       if (!line) { closeList(); continue; }
-      const bullet = line.match(/^(?:[-*•])\\s+(.+)$/);
-      const numbered = line.match(/^\\d+[.)]\\s+(.+)$/);
+      const bullet = line.match(/^(?:[-*•])\s+(.+)$/);
+      const numbered = line.match(/^\d+[.)]\s+(.+)$/);
       if (bullet || numbered) {
         const type = bullet ? "ul" : "ol";
         if (!list || listType !== type) {
@@ -58,7 +59,7 @@
         continue;
       }
       closeList();
-      const heading = line.match(/^#{1,3}\\s+(.+)$/);
+      const heading = line.match(/^#{1,3}\s+(.+)$/);
       const block = document.createElement(heading ? "div" : "p");
       if (heading) block.className = "gemini-answer-heading";
       appendInline(block, heading ? heading[1] : line);
