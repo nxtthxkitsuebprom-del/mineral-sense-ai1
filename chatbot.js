@@ -12,6 +12,9 @@
   const cropInput = document.getElementById("gemini-crop");
   let history = [];
   let busy = false;
+  let lastSubmittedMessage = "";
+  let lastSubmittedAt = 0;
+  const quickButtons = Array.from(section.querySelectorAll("[data-gemini-q]"));
 
   function appendInline(parent, text) {
     // Render only a small safe Markdown subset; never inject model text as HTML.
@@ -134,10 +137,15 @@
 
   async function submitMessage(value) {
     const message = String(value || "").trim();
-    if (!message || busy) return;
+    if (!message || busy) return false;
+    const now = Date.now();
+    if (message === lastSubmittedMessage && now - lastSubmittedAt < 2500) return false;
+    lastSubmittedMessage = message;
+    lastSubmittedAt = now;
     busy = true;
     send.disabled = true;
     input.disabled = true;
+    quickButtons.forEach(button => { button.disabled = true; });
     addMessage(message, "user");
     const pending = addMessage("กำลังวิเคราะห์คำถามและผลตรวจจากเครื่อง...", "assistant");
 
@@ -161,12 +169,15 @@
         { role: "model", text: data.reply || "Gemini ไม่ได้ส่งข้อความตอบกลับ" }
       );
       history = history.slice(-4);
+      return true;
     } catch (error) {
       pending.textContent = "ขออภัย: " + (error.message || "เกิดข้อผิดพลาด");
+      return false;
     } finally {
       busy = false;
       send.disabled = false;
       input.disabled = false;
+      quickButtons.forEach(button => { button.disabled = false; });
       input.focus();
       log.scrollTop = log.scrollHeight;
     }
@@ -175,10 +186,12 @@
   form.addEventListener("submit", event => {
     event.preventDefault();
     const message = input.value;
-    input.value = "";
-    submitMessage(message);
+    submitMessage(message).then(success => {
+      // ล้างช่องเมื่อส่งสำเร็จเท่านั้น; หากล้มเหลวให้ข้อความเดิมคงอยู่
+      if (success && input.value === message) input.value = "";
+    });
   });
-  section.querySelectorAll("[data-gemini-q]").forEach(button => {
+  quickButtons.forEach(button => {
     button.addEventListener("click", () => submitMessage(button.dataset.geminiQ));
   });
 
