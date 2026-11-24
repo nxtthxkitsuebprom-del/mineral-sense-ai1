@@ -118,6 +118,7 @@ function formatSoilValue(type, value) {
   const cropIcons = {"ข้าว":"🌾","ข้าวโพด":"🌽","มันสำปะหลัง":"🥔","อ้อย":"🎋","ถั่วเหลือง":"🫘","ผักบุ้ง":"🥬","คะน้า":"🥬","กะหล่ำปลี":"🥬","แตงกวา":"🥒","พริก":"🌶️","มะเขือเทศ":"🍅","มะม่วง":"🥭","กล้วย":"🍌","มะนาว":"🍋","ฝรั่ง":"🍐","ส้ม":"🍊","มะละกอ":"🍈"};
   function node(id) { return document.getElementById(id) || {textContent:"", className:""}; }
   function setEmpty() {
+    if (advisorPanel) advisorPanel.hidden = true;
     keys.forEach(key => {
       const v=document.querySelector(`[data-value="${key}"]`), m=document.querySelector(`[data-meter="${key}"]`), c=document.querySelector(`[data-color-label="${key}"]`);
       const card=v?.closest(".nutrient-card");
@@ -133,6 +134,63 @@ function formatSoilValue(type, value) {
     node("crop-results").innerHTML='<div class="crop-empty">🌱<b>รอผลตรวจดิน</b><span>เมื่ออ่านค่าครบ ระบบจะแนะนำพืชที่เหมาะสม</span></div>';
     node("scan-progress-text").textContent="0 / 4 ค่า"; node("scan-progress-bar").style.width="0%";
   }
+
+  // Gemini Soil Advisor: เปิดใช้เฉพาะเมื่อ API ยืนยันว่ากล้องอ่านครบ 4 ค่า
+  const advisorPanel = document.getElementById("soil-advisor-panel");
+  const advisorLog = document.getElementById("soil-advisor-log");
+  const advisorQuestion = document.getElementById("soil-advisor-question");
+  const advisorCrop = document.getElementById("soil-advisor-crop");
+  const advisorSend = document.getElementById("soil-advisor-send");
+  let advisorBusy = false;
+  function advisorMessage(text, role) {
+    if (!advisorLog) return;
+    const item = document.createElement("div");
+    item.className = "soil-advisor-message " + (role === "user" ? "user" : "assistant");
+    item.textContent = text;
+    advisorLog.appendChild(item);
+    advisorLog.scrollTop = advisorLog.scrollHeight;
+  }
+  async function askSoilAdvisor(message) {
+    const question = String(message || "").trim();
+    if (!question || advisorBusy || !advisorPanel || advisorPanel.hidden) return;
+    advisorBusy = true;
+    if (advisorSend) advisorSend.disabled = true;
+    advisorMessage(question, "user");
+    const pending = document.createElement("div");
+    pending.className = "soil-advisor-message assistant";
+    pending.textContent = "กำลังวิเคราะห์ผลตรวจจากกล้องด้วย Gemini...";
+    advisorLog.appendChild(pending);
+    advisorLog.scrollTop = advisorLog.scrollHeight;
+    try {
+      const response = await fetch("/api/soil-advisor", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({message:question, crop:advisorCrop?.value || ""})
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || "ไม่สามารถรับคำตอบจาก Gemini ได้");
+      pending.textContent = result.reply;
+    } catch (error) {
+      pending.textContent = "ขออภัย: " + (error.message || "เกิดข้อผิดพลาด");
+    } finally {
+      advisorBusy = false;
+      if (advisorSend) advisorSend.disabled = false;
+      if (advisorLog) advisorLog.scrollTop = advisorLog.scrollHeight;
+    }
+  }
+  if (advisorPanel) {
+    document.querySelectorAll("[data-advisor-q]").forEach(button => {
+      button.addEventListener("click", () => askSoilAdvisor(button.dataset.advisorQ));
+    });
+    document.getElementById("soil-advisor-form")?.addEventListener("submit", event => {
+      event.preventDefault();
+      const value = advisorQuestion?.value || "";
+      if (advisorQuestion) advisorQuestion.value = "";
+      askSoilAdvisor(value);
+    });
+  }
+
   // คำแนะนำการจัดการดินตาม pH ที่กล้องตรวจได้จริง (ไม่ใช่อัตราใส่วัสดุ)
   function soilCareAdvice(phValue, results = {}) {
     const ph = Number(phValue);
@@ -300,6 +358,7 @@ const rankedGroups = cropGroups.map(group => {
       });
       node("scan-progress-text").textContent=`${available.length} / 4 ค่าที่อ่านได้`;
       node("scan-progress-bar").style.width=`${available.length/4*100}%`;
+      if (advisorPanel) advisorPanel.hidden = !(data.device === "live-camera" && data.complete && keys.every(k => by[k]));
       if(data.complete && keys.every(k=>by[k])){
         node("soil-type").textContent="ประเมินค่าสีครบ 4 หลอดแล้ว";
         node("soil-detail").textContent="ค่าที่แสดงเป็นค่าประมาณจากสีที่กล้องอ่านได้";
