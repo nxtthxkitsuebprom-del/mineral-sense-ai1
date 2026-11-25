@@ -59,7 +59,7 @@ def analyze(results):
     else: ph_label='ดินด่างจัด'
     sample_scale = any(('ตัวอย่าง' in str(by[k].get('unit','')) or '0-5' in str(by[k].get('unit','')) or 'ประมาณ' in str(by[k].get('unit','')) or 'สอบเทียบ' in str(by[k].get('unit',''))) for k in ('N','P','K'))
     if sample_scale or (
-    all(v[k] in (0, 1, 2, 3) for k in ('N', 'P', 'K'))
+    all(v[k] in (0, 1, 2, 3, 4) for k in ('N', 'P', 'K'))
     and not all(
         'mg/kg' in str(by[k].get('unit', '')).lower()
         or 'ppm' in str(by[k].get('unit', '')).lower()
@@ -67,7 +67,8 @@ def analyze(results):
     )
 ):
         # แสดงระดับ NPK ตามเกณฑ์ที่ผู้ใช้กำหนด แต่ไม่ใช้ค่าประมาณจัดอันดับพืชจนกว่าจะสอบเทียบ
-        nutrient_labels = {k:band(v[k],THRESHOLDS[k]) for k in ('N','P','K')}
+        scale_labels = {0: "ขาดแคลนวิกฤต", 1: "ขาดแคลน", 2: "พอใช้", 3: "เพียงพอ", 4: "มากเกินไป"}
+        nutrient_labels = {k: (scale_labels[int(v[k])] if v[k].is_integer() and int(v[k]) in scale_labels else "อยู่นอกเกณฑ์ระดับสี") for k in ('N','P','K')}
         ph_crops=[]
         for crop in CROPS:
             ph_score=round(_range_score(v['pH'], *crop['ph']))
@@ -77,7 +78,7 @@ def analyze(results):
                 "water":crop["water"],"tip":crop["tip"]})
         ph_crops.sort(key=lambda x:x["score"],reverse=True)
         return {"available":True,"calibrated":False,"soil_type":ph_label,"fertility":"ยังประเมินไม่ได้",
-                "nutrients":nutrient_labels,"recommendations":["ระดับ NPK แสดงตามเกณฑ์ที่กำหนด แต่ค่าตัวเลขยังเป็นค่าประมาณจากสี ไม่ใช้จัดอันดับพืชจนกว่าจะสอบเทียบ","คำแนะนำพืชด้านล่างเป็นการคัดกรองเบื้องต้นจากค่า pH เท่านั้น","ค่า NPK ยังไม่ใช่ผลวิเคราะห์ mg/kg ที่ผ่านการสอบเทียบ กรุณาสอบเทียบกับชุดน้ำยาจริงก่อนใช้เลือกปุ๋ยหรือยืนยันชนิดพืช"],
+                "nutrients":nutrient_labels,"recommendations":["ระดับ NPK แสดงตามตารางสี 0–4 แต่ค่าตัวเลขยังเป็นค่าประมาณจากสี ไม่ใช้จัดอันดับพืชจนกว่าจะสอบเทียบ","คำแนะนำพืชด้านล่างเป็นการคัดกรองเบื้องต้นจากค่า pH เท่านั้น","ค่า NPK ยังไม่ใช่ผลวิเคราะห์ mg/kg ที่ผ่านการสอบเทียบ กรุณาสอบเทียบกับชุดน้ำยาจริงก่อนใช้เลือกปุ๋ยหรือยืนยันชนิดพืช"],
                 "crops":ph_crops,"values":v,"method":"คัดกรองพืชเบื้องต้นจาก pH เท่านั้น; NPK เป็นค่าประมาณ ยังไม่ผ่านการสอบเทียบ",
                 "caution":"คะแนนพืชยังไม่รวม NPK และไม่ใช่คำยืนยันว่าปลูกได้แน่นอน"}
     nutrient_labels = {k:band(v[k],THRESHOLDS[k]) for k in ('N','P','K')}
