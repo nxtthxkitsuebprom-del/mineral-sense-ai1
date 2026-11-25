@@ -572,7 +572,7 @@ def chatbot_api():
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.2,
-            "max_tokens": 1500,
+            "max_tokens": 2200,
             "options": {"rejectIfBusy": True}
         }
         req = urllib.request.Request(
