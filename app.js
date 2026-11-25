@@ -99,11 +99,11 @@ const dashboard = $("#nutrient-grid");
 if (dashboard) {
   const keys = ["pH", "N", "P", "K"];
   const npkLevels = {
-  0: "ต่ำมาก",
-  1: "ต่ำ",
-  2: "ปานกลาง",
-  3: "สูง",
-  4: "สูงมาก"
+  0: "ขาดแคลนวิกฤต",
+  1: "ขาดแคลน",
+  2: "พอใช้",
+  3: "เพียงพอ",
+  4: "มากเกินไป"
 };
 
 function formatSoilValue(type, value) {
